@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn-caddy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: learn-caddy
+    spec:
+      containers:
+        - name: learn-caddy-auth
+          image: learn-caddy:auth
+          ports:
+            - containerPort: 30000
+        - name: learn-caddy-business
+          image: learn-caddy:business
+          ports:
+            - containerPort: 30001
+        - name: learn-caddy-caddy
+          image: learn-caddy:caddy
+          ports:
+            - containerPort: 80
+  selector:
+    matchLabels:
+      app: learn-caddy
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn-caddy
+spec:
+  ports:
+    - port: 80
+      nodePort: 80
+      protocol: TCP
+  selector:
+    app: learn-caddy
+  type: NodePort
