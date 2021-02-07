@@ -1,0 +1,115 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: learn-linkerd
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn-caddy-caddy
+  namespace: learn-linkerd
+spec:
+  ports:
+    - port: 80
+      nodePort: 30080
+      protocol: TCP
+  selector:
+    app: learn-caddy-caddy
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn-caddy-caddy
+  namespace: learn-linkerd
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: learn-caddy-caddy
+    spec:
+      containers:
+        - name: learn-caddy-caddy
+          image: learn-caddy:caddy2
+          ports:
+            - containerPort: 80
+  selector:
+    matchLabels:
+      app: learn-caddy-caddy
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn-caddy-auth
+  namespace: learn-linkerd
+spec:
+  ports:
+    - port: 30000
+      targetPort: 30000
+      protocol: TCP
+  selector:
+    app: learn-caddy-auth
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn-caddy-auth
+  namespace: learn-linkerd
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: learn-caddy-auth
+    spec:
+      containers:
+        - name: learn-caddy-auth
+          image: learn-caddy:auth
+          ports:
+            - containerPort: 30000
+  selector:
+    matchLabels:
+      app: learn-caddy-auth
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: learn-caddy-business
+  namespace: learn-linkerd
+spec:
+  ports:
+    - port: 30001
+      targetPort: 30001
+      protocol: TCP
+  selector:
+    app: learn-caddy-business
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: learn-caddy-business
+  namespace: learn-linkerd
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: learn-caddy-business
+    spec:
+      containers:
+        - name: learn-caddy-business
+          image: learn-caddy:business
+          ports:
+            - containerPort: 30001
+  selector:
+    matchLabels:
+      app: learn-caddy-business
